@@ -2,15 +2,15 @@
 \alias{SignifReg}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Significant Variable Selection in Linear Regression
+Consistent Significance Controlled Variable Selection in Linear Regression
 }
 \description{
-  Provide a significant variable selection procedure with different directions (forward, backward, stepwise) based on diverse criteria (Mallows' Cp, AIC, BIC, adjusted r-square, p-value). 
+  Provide significance controlled variable selection procedure with different directions (forward, backward, stepwise) based on diverse criteria (Mallows' Cp, AIC, BIC, adjusted r-square, p-value). 
   The algorithm selects a final model with only significant variables based on a correction choice of False Discovery Rate, Bonferroni, or no correction.
 }
 \usage{
 SignifReg(scope, data, alpha = 0.05, direction = "forward", 
-criterion = "p-value", correction = "FDR")
+criterion = "p-value", correction = "FDR", trace = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -52,9 +52,13 @@ criterion = "p-value", correction = "FDR")
   
   either \code{correction = "Bonferroni"}   or \code{correction = "Bonf"} can be used.
 }
+  \item{trace}{
+  	If true, information is printed for each step of variable selection.
+  	Default is true.
+  }
 }
 \details{
-SignifReg selects only significant predictors according to a designated correction. Although a model has the best feature for a chosen criterion, for example, the smallest AIC, this model will be excluded from the selection if it includes insignificant predictors based on the correction criterium. When the criterion is "p-value" and direction is "forward", at each step the variable to be added is the one that generates a model having the smallest maximum p-value of all variables included. This step is repeated as long as every predictor is significant according to the correction criterium. When the criterion is "p-value" and the direction is "backward", the process excludes a predictor having the biggest p-value one by one until the model includes only significant predictors according to the correction criterium. In the case that the criterion is "AIC", "BIC", or "Cp"(Mallows'Cp), SignifReg selects, at each step, the model having the smallest value of the criterion among models having only significant predictors according to the correction criterium. For "r-adj(adjusted r-square), SignifReg selects, at each step, the model having the largest value of adjusted r-square among models having only significant predictors according to the correction criterium."
+SignifReg selects only significant predictors according to a designated correction. Although a model has the best feature for a chosen criterion, for example, the smallest AIC, this model will be excluded from the selection if it includes insignificant predictors based on the correction criterion. When the criterion is "p-value" and direction is "forward", at each step the variable to be added is the one that generates a model having the smallest maximum p-value of all variables included. This step is repeated as long as every predictor is significant according to the correction criterion. When the criterion is "p-value" and the direction is "backward", the process excludes a predictor having the biggest p-value one by one until the model includes only significant predictors according to the correction criterion. In the case that the criterion is "AIC", "BIC", or "Cp"(Mallows'Cp), SignifReg selects, at each step, the model having the smallest value of the criterion among models having only significant predictors according to the correction criterion. For "r-adj(adjusted r-square), SignifReg selects, at each step, the model having the largest value of adjusted r-square among models having only significant predictors according to the correction criterion."
 }
 \value{
 SifnifReg returns an object of the class \code{lm} for a regression model.
@@ -66,9 +70,10 @@ Jongwook Kim <jongwook226@gmail.com>
 and Adriano Zanin Zambom <adriano.zambom@gmail.com>
 }
 
-
+\references{
+Zambom A Z, Kim J. Consistent significance controlled variable selection in high-dimensional regression. Stat.2018;7:e210. https://doi.org/10.1002/sta4.210
+}
 %% ~Make other sections like Warning with \section{Warning }{....} ~
-
 
 \examples{
 ##mtcars data is used as an example.
@@ -92,8 +97,3 @@ summary(model1)
 summary(model2)
 summary(model3)
 }
-
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
