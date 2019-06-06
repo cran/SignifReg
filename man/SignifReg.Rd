@@ -5,45 +5,39 @@
 Consistent Significance Controlled Variable Selection in Linear Regression
 }
 \description{
-  Provide significance controlled variable selection procedure with different directions (forward, backward, stepwise) based on diverse criteria (Mallows' Cp, AIC, BIC, adjusted r-square, p-value). 
-  The algorithm selects a final model with only significant variables based on a correction choice of False Discovery Rate, Bonferroni, or no correction.
+  Significance controlled variable selection selects variables in a linear regression model with different directions of th algorithm (forward, backward, stepwise) based on a chosen criterion (AIC, BIC, adjusted r-square, and p-value). 
+  The algorithm selects a final model with only significant variables based on a correction choice of False Discovery Rate, Bonferroni, or fixed level.
 }
 \usage{
-SignifReg(scope, data, alpha = 0.05, direction = "forward", 
-criterion = "p-value", correction = "FDR", trace = TRUE)
+SignifReg(fit, scope, alpha = 0.05, direction = "forward", criterion = "p-value",
+ correction = "FDR", trace=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{scope}{
-  The range of models examined in regression. It should be a formula containing a response variable and predictors.
-  For the full model, \code{<response var>~.} can be used. 
-  }
-  \item{data}{
-  Data frame, examined in regression.
+  \item{fit}{
+	an lm object representing a model. It is an initial model for the variable selection 
 }
+  \item{scope}{
+  The range of models examined in regression. It should be either a data.frame or formula containing predictors. When scope is data.frame, all variables except the response variable in the data.frame are considered for the variable selection.
+  }
   \item{alpha}{
   Significance level. Default value is 0.05.
 }
   \item{direction}{
-  Direction in variable selection: \code{direction = "step_null"}, 
+  Direction in variable selection: \code{direction = "both"}, 
  
-  \code{direction = "step_full"}, \code{direction = "forward"},
+  \code{direction = "forward"},
    and 
    
    \code{direction = "backward"} are available. 
-  \code{direction = "step_null"} is a stepwise selection starting from a null model. 
-  \code{direction = "step_full"} is a stepwise selection starting from a full model. Default is \code{direction = "forward"}. 
-  When criterion is p-value, \code{direction = "step_null"} and 
-  
-  \code{direction = "step_full"} are unavailable.
+  \code{direction = "both"} is a stepwise selection. Default is \code{direction = "forward"}. 
 }
   \item{criterion}{
   Criterion to select predictor variables. \code{criterion = "AIC"}, 
-  
-  \code{criterion = "BIC"}, \code{criterion = "Cp"}(Mallows'Cp), \code{criterion = "r-adj"} (adjusted r-square), and \code{criterion = "p-value"} are available. Default is p-value.
+  \code{criterion = "BIC"}, \code{criterion = "r-adj"} (adjusted r-square), and \code{criterion = "p-value"} are available. Default is p-value.
 }
   \item{correction}{
-  Correction criterion to reduce multiple testing error. \code{correction = "FDR"} (False Discovery Rate), \code{correction = "Bonferroni"}, 
+  Correction for multiple testing accumulation of error. \code{correction = "FDR"} (False Discovery Rate), \code{correction = "Bonferroni"}, 
   and 
   
   \code{correction = "None"} (no correction) are available. Default is 
@@ -54,46 +48,49 @@ criterion = "p-value", correction = "FDR", trace = TRUE)
 }
   \item{trace}{
   	If true, information is printed for each step of variable selection.
-  	Default is true.
+  	Default is \code{FALSE}.
+  	Offers summaries of information as every single predictor in the scope is added to or removed from the model. \code{max_pvalue} indicates the maximum p-value from the multiple t-tests for each predictor in the model. This value can be used as a criterion in the case \code{criterion = "p-value"}. \code{alpha_cut_off}, \code{Bonferroni}, and \code{FDR} represent whether the model satisfies the significance by correction. \code{alpha_cut_off} means no correction and all p-values will be compared to it.
   }
 }
 \details{
-SignifReg selects only significant predictors according to a designated correction. Although a model has the best feature for a chosen criterion, for example, the smallest AIC, this model will be excluded from the selection if it includes insignificant predictors based on the correction criterion. When the criterion is "p-value" and direction is "forward", at each step the variable to be added is the one that generates a model having the smallest maximum p-value of all variables included. This step is repeated as long as every predictor is significant according to the correction criterion. When the criterion is "p-value" and the direction is "backward", the process excludes a predictor having the biggest p-value one by one until the model includes only significant predictors according to the correction criterion. In the case that the criterion is "AIC", "BIC", or "Cp"(Mallows'Cp), SignifReg selects, at each step, the model having the smallest value of the criterion among models having only significant predictors according to the correction criterion. For "r-adj(adjusted r-square), SignifReg selects, at each step, the model having the largest value of adjusted r-square among models having only significant predictors according to the correction criterion."
+SignifReg selects only significant predictors according to a designated creterion. Although a model has the best feature for a chosen criterion, for example, the smallest AIC, this model will be excluded from the selection if it includes insignificant predictors based on the chosen correction. When the criterion is "p-value", at each step, the variable to be added or substracted is the one that generates a model having the smallest maximum p-value of the t-tests. This step is repeated as long as every predictor is significant according to the correction criterion. In the case that the criterion is "AIC", and "BIC", SignifReg selects, at each step, the model having the smallest value of the criterion among models having only significant predictors according to the chosen correction. For "r-adj(adjusted r-square), SignifReg selects, at each step, the model having the largest value of adjusted r-square among models having only significant predictors according to the chosen correction.
 }
 \value{
 SifnifReg returns an object of the class \code{lm} for a regression model.
 }
-
-\author{
-Jongwook Kim <jongwook226@gmail.com> 
-
-and Adriano Zanin Zambom <adriano.zambom@gmail.com>
-}
-
 \references{
 Zambom A Z, Kim J. Consistent significance controlled variable selection in high-dimensional regression. Stat.2018;7:e210. https://doi.org/10.1002/sta4.210
 }
+\author{
+Jongwook Kim <jongwook226@gmail.com> 
+
+Adriano Zanin Zambom <adriano.zambom@gmail.com>
+}
+%\note{
+%%  ~~further notes~~
+%}
+
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
+%\seealso{
+%% ~~objects to See Also as \code{\link{help}}, ~~~
+%}
 \examples{
 ##mtcars data is used as an example.
 
 data(mtcars)
-scope1 <- mpg~.
-model1 <- SignifReg(scope=scope1,data=mtcars,alpha=0.05,
-direction="forward", criterion="p-value",
-correction="FDR")
 
-model2 <-SignifReg(scope=scope1,data=mtcars,alpha=0.05,
-direction="step_full", criterion="Cp",
-correction="Bonferroni")
+fit1 <- lm(mpg~1, mtcars)
+summary(SignifReg(fit1))
+summary(SignifReg(fit1, scope=mtcars ,criterion="r-adj", direction="forward" 
+,correction="None", trace=TRUE))
+summary(SignifReg(fit1, scope=~.+disp+cyl+wt+qsec, criterion="p-value", direction="both",
+correction="FDR", trace=TRUE))
 
-scope2 <- mpg~cyl+disp+hp+drat+wt+qsec
-model3 <-SignifReg(scope=scope2,data=mtcars,alpha=0.05,
-direction="step_null", criterion="AIC",
-correction="None")
-
-summary(model1)
-summary(model2)
-summary(model3)
+fit2 <- lm(mpg~., mtcars)
+summary(SignifReg(fit2, scope=~.-disp-cyl-wt-hp-drat-qset-carb , direction="backward", 
+correction="Bonf", trace=TRUE))
+summary(SignifReg(fit2, scope=mtcars ,criterion="AIC", direction="both",
+correction="None", trace=TRUE))
 }
+
