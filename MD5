@@ -1,11 +1,11 @@
-688480e3fa0c16a48f379994fdd432e1 *DESCRIPTION
+a757af6573b198d2065ab81d88aa2957 *DESCRIPTION
 3a3bca463760523be6ad54e797ac3873 *NAMESPACE
-b754042bdb6401a4aebb637486f7b70b *R/SignifReg.R
+a28bd46a92bc9c430f0ebcb952419cde *R/SignifReg.R
 ec6afecad5259ce4aa638b596dd9b140 *R/add1SignifReg.R
 91a8c4b70e1e8d31c039398072010dd0 *R/add1summary.R
 30d941db2a5465b32ce29ee639e46fed *R/drop1SignifReg.R
 50b27d40c60803cb97dfaccf17fc34bd *R/drop1summary.R
-44a99b0ed7a02ea40e4938fb0b7c32ba *build/partial.rdb
+d02a5fabd8465588bfd915f797b0ccdb *build/partial.rdb
 73668e44f59b1214be43bb032301e5c1 *man/SignifReg-package.Rd
 8465b792b669ca784f37c22ef11bb788 *man/SignifReg.Rd
 c719bcf6063954d2127789a00d326038 *man/add1SignifReg.Rd

@@ -58,10 +58,23 @@ function(fit,scope=eval(fit$call$data), alpha = 0.05,direction = "forward",crite
         response <- fit$terms[[2]] #reponse variable
         reg_var <- variable.names(fit)[-1] #save all the dependent vars of 'fit' model
         
+        if((length(fit$model)-1) != length(reg_var)){ #in the case that predictors are matrix, so when multiple columns have only one dimenstion
+            data <- data.frame(fit$model[1],fit$model[2][,1])
+            colnames(data) <- c(as.character(response), reg_var)
+            scope <- data
+            fit <- lm(paste(response,"~",paste(reg_var,collapse = "+")),data)
+        }
+        if(length(scope)==0){
+            scope <- data.frame(fit$model[1],fit$model[2][,1])
+            colnames(scope) <- c(as.character(response), reg_var)
+        }
+        
         if(is.data.frame(scope)){ #when scope is data.frame
             var <- colnames(scope)
             res_index <- which(var==response) #index of a response variable
-            var <- var[-res_index] #save predictor variables by excluding a response variable
+            if(length(res_index)!=0){ #only in the case that response variable is not in the data.frame
+                var <- var[-res_index] #save predictor variables by excluding a response variable
+            }
             if (length(reg_var!=0)){ #in the case of not null model
                 for(i in 1:length(reg_var)){ #selecting predictors not included in the current model (candidate predictors)
                     var_index <- which(var==reg_var[i])
@@ -209,11 +222,23 @@ function(fit,scope=eval(fit$call$data), alpha = 0.05,direction = "forward",crite
         response <- fit$terms[[2]] #reponse variable
         reg_var <- variable.names(fit)[-1] #save all the dependent vars of 'fit' model
         
+        if((length(fit$model)-1) != length(reg_var)){ #in the case that predictors are matrix, so when multiple columns have only one dimenstion
+            data <- data.frame(fit$model[1],fit$model[2][,1])
+            colnames(data) <- c(as.character(response), reg_var)
+            scope <- data
+            fit <- lm(paste(response,"~",paste(reg_var,collapse = "+")),data)
+        }
+        if(length(scope)==0){
+            scope <- data.frame(fit$model[1],fit$model[2][,1])
+            colnames(scope) <- c(as.character(response), reg_var)
+        }
         
         if(is.data.frame(scope)){ #when scope is data.frame
             var <- colnames(scope)
             res_index <- which(var==response) #index of a response variable
-            var <- var[-res_index] #save predictor variables by excluding a response variable
+            if(length(res_index)!=0){ #only in the case that response variable is not in the data.frame
+                var <- var[-res_index] #save predictor variables by excluding a response variable
+            }
             var <- var[var %in% reg_var] #remove candidate predictor(s) variable which is not in the fit model
         }else if(class(scope)=="formula"){ #when scope is formula
             if(all.vars(scope)[1]=="."){
