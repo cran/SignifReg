@@ -124,35 +124,33 @@ drop1SignifReg.default <- function(fit, scope=eval(fit$call$data), alpha = 0.05,
     
     fit2 <- update(fit, paste(".~. -", var[var_index]))
     pvalues <- drop1(fit2,test="F")$"Pr(>F)"[-1] #p-values
-    
+
+    pvalues_current_model <- drop1(fit,test="F")$"Pr(>F)"[-1] #p-values
+        
     if(override == FALSE){
         if(correction=="FDR"){
             result <- fdr(pvalues)
+            result_current_model <- fdr(pvalues_current_model)
         }else if(correction=="Bonfferoni" | correction=="Bonf"){
             result <- bonferroni(pvalues) #Bonfferoni cut-off
+            result_current_model <- bonferroni(pvalues_current_model)
         }else if(correction=="None"){
             result <- none(pvalues)
+            result_current_model <- none(pvalues_current_model)
         }
         if(criterion == "p-value"){
-            if(result == FALSE){
-                fit <- fit2
-            }else if(result == TRUE){
-                
+            if(result_current_model == TRUE){
                 fit <- fit
+            }else{
+                fit <- fit2
             }
         }else if(criterion == "AIC" | criterion =="BIC" | criterion =="r-adj"){
-            if(result == TRUE & min(crit_value[-1]) > crit_value[1]){
-                fit <- fit
-            }else fit <- fit2
+            if((result_current_model == FALSE) && (min(crit_value[-1]) > crit_value[1])){
+                fit <- fit2
+            }else fit <- fit
         }
     }else if(override == TRUE){ #do not check correction)
-        if(criterion == "p-value"){
-            fit <- fit2
-        }else if(criterion == "AIC" | criterion =="BIC" | criterion =="r-adj"){
-            if(min(crit_value[-1]) > crit_value[1]){
-                fit <- fit
-            }else fit <- fit2
-        }
+        fit <- fit2
     }
     return(fit)
 }

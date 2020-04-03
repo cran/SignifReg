@@ -58,7 +58,7 @@ function(fit,scope=eval(fit$call$data), alpha = 0.05,direction = "forward",crite
         response <- fit$terms[[2]] #reponse variable
         reg_var <- variable.names(fit)[-1] #save all the dependent vars of 'fit' model
         
-        if((length(fit$model)-1) != length(reg_var)){ #in the case that predictors are matrix, so when multiple columns have only one dimenstion
+        if((length(fit$model)-1) != length(reg_var)){ #in the case that predictors are matrix, so when multiple columns have only one dimension
             data <- data.frame(fit$model[1],fit$model[2][,1])
             colnames(data) <- c(as.character(response), reg_var)
             scope <- data

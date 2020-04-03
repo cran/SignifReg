@@ -5,7 +5,7 @@
 Drop a possible single predictor to a regression model based on Consistent Significance Controlled Variable Selection
 }
 \description{
-Add or drop a single term to the model using the method Consistent Significance Controlled Variable Selection.
+Drop a single term to the model using the method Consistent Significance Controlled Variable Selection.
 The function also provides a summary table of the selection. \code{max_pvalue} indicates the maximum p-value from the multiple t-tests for each predictor. This value can be used as a criterion in the case \code{criterion = "p-value"}. \code{alpha_cut_off}, \code{Bonferroni}, and \code{FDR} represent whether the entire model satisfies the significance correction. \code{alpha_cut_off} means no correction.
  
 }
@@ -38,7 +38,7 @@ drop1SignifReg(fit, scope, alpha = 0.05, criterion = "p-value",
   
   either \code{correction = "Bonferroni"}   or \code{correction = "Bonf"} can be used.
 }
-  \item{override}{If \code{override = TRUE}, it returns a new lm object that excludes a new variable according to criterion even if the new model does not pass the correction. }
+  \item{override}{If \code{override = TRUE}, it returns a new lm object that excludes a new variable according to criterion even if the current model passes the correction. }
 }
 %\details{
 %%  ~~ If necessary, more details than the description above ~~

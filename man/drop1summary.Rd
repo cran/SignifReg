@@ -5,7 +5,7 @@
 Summaries of add1 or drop1
 }
 \description{
-Offers summaries of information as every single predictor in the scope is added to or removed from the model. \code{max_pvalue} indicates the maximum p-value from the multiple t-tests for each predictor. \code{alpha_cut_off}, \code{Bonferroni}, and \code{FDR} represent whether the model satisfies the significance by correction. \code{alpha_cut_off} means no correction.
+Offers summaries of information as every single predictor in the scope is removed from the model. \code{max_pvalue} indicates the maximum p-value from the multiple t-tests for each predictor. \code{alpha_cut_off}, \code{Bonferroni}, and \code{FDR} represent whether the model satisfies the significance by correction. \code{alpha_cut_off} means no correction.
 }
 \usage{
 drop1summary(fit, scope, alpha = 0.05)
