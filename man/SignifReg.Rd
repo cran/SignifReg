@@ -2,10 +2,10 @@
 \alias{SignifReg}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Consistent Significance Controlled Variable Selection in Linear Regression
+Significance Controlled Variable Selection in Linear Regression
 }
 \description{
-  Significance controlled variable selection selects variables in a linear regression model with different directions of th algorithm (forward, backward, stepwise) based on a chosen criterion (AIC, BIC, adjusted r-square, and p-value). 
+  Significance controlled variable selection selects variables in a linear regression model with different directions of the algorithm (forward, backward, stepwise) based on a chosen criterion (AIC, BIC, adjusted r-square, PRESS or p-value). 
   The algorithm selects a final model with only significant variables based on a correction choice of False Discovery Rate, Bonferroni, or fixed level.
 }
 \usage{
@@ -49,11 +49,11 @@ SignifReg(fit, scope, alpha = 0.05, direction = "forward", criterion = "p-value"
   \item{trace}{
   	If true, information is printed for each step of variable selection.
   	Default is \code{FALSE}.
-  	Offers summaries of information as every single predictor in the scope is added to or removed from the model. \code{max_pvalue} indicates the maximum p-value from the multiple t-tests for each predictor in the model. This value can be used as a criterion in the case \code{criterion = "p-value"}. \code{alpha_cut_off}, \code{Bonferroni}, and \code{FDR} represent whether the model satisfies the significance by correction. \code{alpha_cut_off} means no correction and all p-values will be compared to it.
+  	Offers summaries of prospective models as each predictor in the scope is added to or removed from the model. \code{max_pvalue} indicates the maximum p-value from the multiple t-tests for each predictor in the model. This value can be used as a criterion in the case \code{criterion = "p-value"}. \code{alpha_cut_off}, \code{Bonferroni}, and \code{FDR} represent whether the model satisfies the significance by correction. \code{alpha_cut_off} means no correction and all p-values will be compared to it.
   }
 }
 \details{
-SignifReg selects only significant predictors according to a designated creterion. Although a model has the best feature for a chosen criterion, for example, the smallest AIC, this model will be excluded from the selection if it includes insignificant predictors based on the chosen correction. When the criterion is "p-value", at each step, the variable to be added or substracted is the one that generates a model having the smallest maximum p-value of the t-tests. This step is repeated as long as every predictor is significant according to the correction criterion. In the case that the criterion is "AIC", and "BIC", SignifReg selects, at each step, the model having the smallest value of the criterion among models having only significant predictors according to the chosen correction. For "r-adj(adjusted r-square), SignifReg selects, at each step, the model having the largest value of adjusted r-square among models having only significant predictors according to the chosen correction.
+SignifReg selects only significant predictors according to a designated criterion. A model with the best criterion, for example, the smallest AIC, will not be considered if it includes insignificant predictors based on the chosen correction. When the criterion is "p-value", at each step, the variable to be added or removed is the one that generates a model having the smallest maximum p-value of the t-tests in the prospective models. This step is repeated as long as every predictor is significant according to the correction criterion. In the case that the criterion is "AIC", and "BIC", SignifReg selects, at each step, the model having the smallest value of the criterion among models having only significant predictors according to the chosen correction. 
 }
 \value{
 SifnifReg returns an object of the class \code{lm} for a regression model.
@@ -72,9 +72,9 @@ Adriano Zanin Zambom <adriano.zambom@gmail.com>
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-%\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-%}
+\seealso{
+\code{\link{add1SignifReg}}, \code{\link{drop1SignifReg}}, \code{\link{add1summary}}, \code{\link{drop1summary}}
+}
 \examples{
 ##mtcars data is used as an example.
 

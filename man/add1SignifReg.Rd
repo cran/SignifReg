@@ -3,23 +3,23 @@
 
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Add a possible single predictor to a regression model based on Consistent Significance Controlled Variable Selection
+Add a predictor to a linear regression model using the forward step in the Significance Controlled Variable Selection method
 }
 \description{
-	Add a single term to the model using the method Consistent Significance Controlled Variable Selection.
-The function also provides a summary table of the selection. \code{max_pvalue} indicates the maximum p-value from the multiple t-tests for each predictor. This value can be used as a criterion in the case \code{criterion = "p-value"}. \code{alpha_cut_off}, \code{Bonferroni}, and \code{FDR} represent whether the entire model satisfies the significance correction. \code{alpha_cut_off} means no correction.
+	add1SignifReg includes in the model the predictor, out of the available predictors, which minimizes the criterion (AIC, BIC, r-ajd, PRESS, max p-value) as long as all the p-values of the predictors in the prospective model (including the prospective predictor) are below the chosen correction method (Bonferroni, FDR, None). The function provides a summary table of the prospective models. 
+	
+	\code{max_pvalue} indicates the maximum p-value from the multiple t-tests for each predictor. More specifically, the algorithm computes the prospective models with each predictor included, and all p-values of this prospective model. Then, the predictor selected is the one whose generating model has the smallest p-values, in fact, the minimum of the maximum p-values in each prospective model.
 }
 \usage{
 add1SignifReg(fit, scope, alpha = 0.05, criterion = "p-value",
  correction = "FDR", override = FALSE)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{fit}{
-	an lm object representing a model. It is an initial model for the variable selection 
+	an lm object representing a linear regression model. 
 }
   \item{scope}{
-  The range of models examined in regression. It should be either a data.frame or formula containing predictors. When scope is data.frame, all variables except the response variable in the data.frame are considered for the variable selection.
+  The range of models examined in regression. It should be either a data.frame or formula containing predictors. When scope is data.frame, all variables except the response variable in the data.frame are considered.
 }
   \item{alpha}{
   Significance level. Default value is 0.05.
@@ -38,7 +38,7 @@ add1SignifReg(fit, scope, alpha = 0.05, criterion = "p-value",
   
   either \code{correction = "Bonferroni"}   or \code{correction = "Bonf"} can be used.
 }
-  \item{override}{If \code{override = TRUE}, it returns a new lm object that adds a new variable according to criterion even if the new model does not pass the correction. }
+  \item{override}{If \code{override = TRUE}, it returns a new lm object that adds a new variable according to criterion even if the new model does not pass the multiple testing p-value correction. }
 }
 %\details{
 %%  ~~ If necessary, more details than the description above ~~
@@ -64,9 +64,9 @@ Adriano Zanin Zambom <adriano.zambom@gmail.com>
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-%\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-%}
+\seealso{
+ \code{\link{SignifReg}},  \code{\link{add1summary}},  \code{\link{drop1summary}},  \code{\link{drop1SignifReg}}
+}
 \examples{
 ##mtcars data is used as an example.
 

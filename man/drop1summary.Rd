@@ -2,10 +2,10 @@
 \alias{drop1summary}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Summaries of add1 or drop1
+Summaries of models when removing a predictor.
 }
 \description{
-Offers summaries of information as every single predictor in the scope is removed from the model. \code{max_pvalue} indicates the maximum p-value from the multiple t-tests for each predictor. \code{alpha_cut_off}, \code{Bonferroni}, and \code{FDR} represent whether the model satisfies the significance by correction. \code{alpha_cut_off} means no correction.
+Offers summaries of prospective models as every predictor in the model is removed from the model. \code{max_pvalue} indicates the maximum p-value from the multiple t-tests for each predictor. \code{alpha_cut_off}, \code{Bonferroni}, and \code{FDR} represent whether the model satisfies the significance correction. \code{alpha_cut_off} means no correction.
 }
 \usage{
 drop1summary(fit, scope, alpha = 0.05)
@@ -13,7 +13,7 @@ drop1summary(fit, scope, alpha = 0.05)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{fit}{
-	an lm object representing a model. It is an initial model for the variable selection 
+	an lm object representing a model.
 
 }
   \item{scope}{
@@ -47,9 +47,9 @@ Adriano Zanin Zambom <adriano.zambom@gmail.com>
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-%\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-%}
+\seealso{
+ \code{\link{SignifReg}},  \code{\link{add1summary}},  \code{\link{add1SignifReg}}, \code{\link{drop1SignifReg}},  
+}
 \examples{
 ##mtcars data is used as an example.
 	
