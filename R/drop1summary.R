@@ -1,145 +1,113 @@
-drop1summary <- function(fit, scope=eval(fit$call$data), alpha = 0.05)UseMethod("drop1summary")
-drop1summary.default <- function(fit, scope=eval(fit$call$data), alpha = 0.05){
+drop1summary <- function(fit, scope, alpha = 0.05, adjust.method = "fdr", sort.by = "p-value")UseMethod("drop1summary")
+drop1summary.default <- function(fit, scope, alpha = 0.05, adjust.method = "fdr", sort.by = "p-value"){
     
     #####errors messages for wrong inputs#####
     if(alpha>1 || alpha <0){
         stop("\nSignificance level alpha should be smaller than 1 and larger than 0\n")
     }
-    
-    #######################correction functions########################
-    
-    #correction function for Bonferroni, FDR, and default
-    none <- function(pvalues){ #function for no correction
-        max_p <- max(pvalues) #save maximum p-value
-        result <- ifelse(max_p <= alpha, TRUE, FALSE)
-        return(result) #when satisfy corrected criterion return result=TRUE, otherwise result=FALSE
-    }
-    bonferroni <- function(pvalues){
-        max_p <- max(pvalues) #save maximum p-value
-        result <- ifelse(max_p <= alpha/length(pvalues), TRUE, FALSE)#alpha/number of tests
-        return(result) #when satisfy corrected criterion return result=TRUE, otherwise result=FALSE
-    }
-    fdr <- function(pvalues){
-        pi <- sort(pvalues) #sorting pvalues in ascending order
-        j <- c(1:length(pi))
-        t <- 0
-        for(n in j){
-            if(pi[n] <= (n/length(pvalues))*(alpha/sum(j^(-1)))) t <- 1+t
+
+  if ((adjust.method != "fdr") && (adjust.method != "holm") && (adjust.method != "hochberg") && (adjust.method != "hommel") && (adjust.method != "bonferroni") && (adjust.method != "BH") && (adjust.method != "BY") && (adjust.method != "none"))
+    stop("adjust.method must be a valid method for p.adjust()")
+  
+  
+
+
+
+
+
+
+
+
+################# start here ################################################
+################# start here ################################################
+################# start here ################################################
+################# start here ################################################
+################# start here ################################################
+################# start here ################################################
+
+    if (missing(scope)) 
+    {
+    	var_lower = numeric()
+    	var_upper = attr(terms(fit), "factors")	
+    } else {
+        if (is.list(scope)) {
+            var_lower <- if (!is.null(var_lower <- scope$lower)) 
+                attr(terms(update.formula(fit, var_lower)), "factors")
+            else numeric()
+            var_upper <- if (!is.null(var_upper <- scope$upper)) 
+                attr(terms(update.formula(fit, var_upper)), "factors")
         }
-        result <- ifelse (t == length(pi), TRUE, FALSE) #if true, that means every variable satisfies the FDR criterion.
-        return(result) #when satisfy corrected criterion return result=TRUE, otherwise result=FALSE
+        else {
+            var_upper <- if (!is.null(var_upper <- scope)) 
+                attr(terms(update.formula(fit, scope)), "factors")
+            var_lower <- numeric()
+        }
     }
     
+    var_current <- attr(terms(fit), "factors")
+    scope <- factor.scope(var_current, list(add = var_upper, drop = var_lower))    	
 
-    #######################PRESS residuals########################
-	PRESS <- function(linear.model) {
-	  #' calculate the predictive residuals
-	  pr <- residuals(linear.model)/(1-lm.influence(linear.model)$hat)
-	  #' calculate the PRESS
-	  PRESS <- sum(pr^2)
-	  return(PRESS)
-	}
-
-    ####################### VIF ########################
-	vif <- function(mod, ...) 
+	if (length(scope$drop) > 0)
 	{
-	    if (any(is.na(coef(mod)))) 
-	        stop ("there are aliased coefficients in the model")
-	    v <- vcov(mod)
-	    assign <- attr(model.matrix(mod), "assign")
-	    if (names(coefficients(mod)[1]) == "(Intercept)") {
-	        v <- v[-1, -1]
-	        assign <- assign[-1]
+		  ################# Outcome Table #################
+	    out_tab <- data.frame("Resid Dev" = rep(NA,length(scope$drop)+1), "AIC" = rep(NA,length(scope$drop)+1), "BIC" = rep(NA,length(scope$drop)+1), "adj.rsq" = rep(NA,length(scope$drop)+1), "PRESS" = rep(NA,length(scope$drop)+1), "max_pvalue" = rep(NA,length(scope$drop)+1), "max VIF" = rep(NA,length(scope$drop)+1), "correction" = rep(NA,length(scope$drop)+1))
+	    colnames(out_tab)[8] = paste("pass", adjust.method, "correction")
+	    
+	    rownames(out_tab) <- c("<none>", paste("-",scope$drop))
+	    
+	    ########### Current Model #############################
+	    out_tab[1,1:5] <- c(deviance(fit), AIC(fit), BIC(fit), summary(fit)$"adj.r.squared", sum((residuals(fit)/(1-lm.influence(fit)$hat))^2))
+	    out_tab[1,7] = ifelse((length(attr(terms(fit),"term.labels")) > 1), max(vif(fit)), NA) 
+	
+	    fit_pval <- drop1(fit, test="F")$"Pr(>F)"[-1] #save p-values of the current model
+	    if(length(fit_pval) == 0){ #for the null model
+	        out_tab[1,6] <- out_tab[1,8] <- NA
+	    }else{
+	        out_tab[1,6] <- max(fit_pval) #the max p-value of the current model
+	        out_tab[1,8] <- ifelse(sum(p.adjust(fit_pval, method = adjust.method) <= alpha) < length(fit_pval), FALSE, TRUE) #pvalue cut-off (no correction)
 	    }
-	    else warning("No intercept: vifs may not be sensible.")
-	    terms <- labels(terms(mod))
-	    n.terms <- length(terms)
-	    if (n.terms < 2) stop("model contains fewer than 2 terms")
-	    R <- cov2cor(v)
-	    detR <- det(R)
-	    result <- matrix(0, n.terms, 3)
-	    rownames(result) <- terms
-	    colnames(result) <- c("GVIF", "Df", "GVIF^(1/(2*Df))")
-	    for (term in 1:n.terms) {
-	        subs <- which(assign == term)
-	        result[term, 1] <- det(as.matrix(R[subs, subs])) *
-	            det(as.matrix(R[-subs, -subs])) / detR
-	        result[term, 2] <- length(subs)
+	    
+		########### Prospective Models #############################
+	    for (n in 1:length(scope$drop))
+	    {
+	        fit2 <- update(fit, paste(".~. -", scope$drop[n]))
+	        out_tab[n+1,1:5] <- c(deviance(fit2), AIC(fit2), BIC(fit2), summary(fit2)$"adj.r.squared", sum((residuals(fit2)/(1-lm.influence(fit2)$hat))^2))
+		    out_tab[n+1,7] = ifelse((length(attr(terms(fit2),"term.labels")) > 1), max(vif(fit2)), NA) 
+	        
+	        if (length(coef(fit2)) == 1){ ## intercept model
+	        	out_tab[n+1,6] <- out_tab[n+1,8]  <- NA
+	        } else
+	        {
+		        fit2_pval <- drop1(fit2, test="F")$"Pr(>F)"[-1] #save p-values of each model
+		        out_tab[n+1,6] <- max(fit2_pval) #the max p-value of each model
+		        out_tab[n+1,8] <- ifelse(sum(p.adjust(fit2_pval, method = adjust.method) <= alpha) < length(fit2_pval), FALSE, TRUE) #pvalue cut-off (no correction)
+		    }
 	    }
-	    if (all(result[, 2] == 1)) result <- result[, 1]
-	    else result[, 3] <- result[, 1]^(1/(2 * result[, 2]))
-	    result
+		
+		
+		##### sort table ##################################################
+		if (sort.by == "p-value")
+			sort_var = 6
+		else if (sort.by == "AIC")
+			sort_var = 2
+		else if (sort.by == "BIC")
+			sort_var = 3
+		else if (sort.by == "r-adj")
+			sort_var = 4
+		else if (sort.by == "PRESS")
+			sort_var = 5
+	    out_tab = out_tab[order(as.numeric(out_tab[,sort_var])),]
+	    
+	    out_tab[,1:7] = data.frame(lapply(out_tab[,1:7], round, 5))
+	} else
+	{
+		out_tab = NULL ### there is nothing in scope to add
+		print("no terms in scope for dropping from object.")
 	}
-
-		crit_column_to_sort = 6 ## this is used to sort and present the out_tab (ouput table) sorted by this criterion
-    
-    
-        #########################drop1.summary proccess############################
-    
-    data <- eval(fit$call$data) #save data
-    response <- fit$terms[[2]] #reponse variable
-    reg_var <- variable.names(fit)[-1] #save all the dependent vars of 'fit' model
-    
-    if(is.data.frame(scope)){ #when scope is data.frame
-        var <- colnames(scope)
-        res_index <- which(var==response) #index of a response variable
-        var <- var[-res_index] #save predictor variables by excluding a response variable
-    }else if(class(scope)=="formula"){ #when scope is formula
-        if(all.vars(scope)[1]=="."){
-            var <- all.vars(scope)[-1]
-        }else if(all.vars(scope)[1] == response){
-            var <- all.vars(scope)[c(-1,-2)]
-        }else stop("\nwrong scope\n")
-    }else stop("\nwrong scope\n")
-    
-    out_tab <- matrix(nrow=length(var)+1, ncol=10) #outcome table
-    colnames(out_tab) <- c("RSS", "AIC", "BIC", "adj.rsq", "PRESS", "max_pvalue", "max VIF", "alpha_cut_off", "Bonferroni", "FDR")
-    rownames(out_tab) <- c("<none>", paste("-",var))
-    out_tab[1,1] <- deviance(fit) #RSS of the current model
-    out_tab[1,2] <- AIC(fit) #AIC of the current model
-    out_tab[1,3] <- BIC(fit) #BIC of the current model
-    out_tab[1,4] <- summary(fit)$"adj.r.squared" #adjusted r-square of the current model
-    out_tab[1,5] <- PRESS(fit) #Press of the current model
-    
-    if (length(fit$coefficients) > 2) ## one of them is beta0, so need 3 or more coef
-        out_tab[1,7] <- max(vif(fit)) 
-    else
-        out_tab[1,7] <- NA
-
-    
-    fit_pval <- drop1(fit, test="F")$"Pr(>F)"[-1] #save p-values of the current model
-    if(length(fit_pval)==0) stop("\nwrong scope\n")
-    out_tab[1,6] <- max(fit_pval) #the max p-value of the current model
-    out_tab[1,8] <- none(fit_pval) #pvalue cut-off (no correction)
-    out_tab[1,9] <- bonferroni(fit_pval) #Bonfferoni cut-off
-    out_tab[1,10] <- fdr(fit_pval) #FDR cut-off
-    
-    reg <- paste(response,"~",paste(reg_var,collapse="+"))
-    for (n in 1:length(var)){
-        #fit2 <- lm(paste(reg,"-",var[n]),data)
-        fit2 <- update(fit, paste(".~. -", var[n]))
-        out_tab[n+1,1] <- deviance(fit2) #RSS of each model
-        out_tab[n+1,2] <- AIC(fit2) #save value of AIC value for each model ##########
-        out_tab[n+1,3] <- BIC(fit2) #save value of BIC value for each model ##########
-        out_tab[n+1,4] <- summary(fit2)$"adj.r.squared" #save adjusted r-square
-        out_tab[n+1,5] <- PRESS(fit2)
-        
-        if (length(fit2$coefficients) > 2) ## one of them is beta0, so need 3 or more coef
-            out_tab[n+1,7] <- max(vif(fit2))
-        else
-            out_tab[n+1,7] <- NA
-
-        
-        fit2_pval <- drop1(fit2, test="F")$"Pr(>F)"[-1] #save p-values of each model
-        if(length(fit2_pval)==0)  stop("\nwrong scope\n")
-        out_tab[n+1,6] <- max(fit2_pval) #the max p-value of each model
-        out_tab[n+1,8] <- none(fit2_pval) #pvalue cut-off (no correction)
-        out_tab[n+1,9] <- bonferroni(fit2_pval) #Bonfferoni cut-off
-        out_tab[n+1,10] <- fdr(fit2_pval) #FDR cut-off
-    }
-    
-    out_tab = out_tab[order(as.numeric(out_tab[,crit_column_to_sort])),]
-    out_tab <- round(as.table(out_tab, dimnames),5)
-    out_tab[,8:10] <- as.character(as.logical(out_tab[,8:10]))
+	
     return(out_tab)
+	
+
+
+
 }

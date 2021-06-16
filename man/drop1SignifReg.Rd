@@ -2,43 +2,39 @@
 \alias{drop1SignifReg}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Drop a predictor to a linear regression model using the backward step in the Significance Controlled Variable Selection method
+Drop a predictor to a (generalized) linear regression model using the backward step in the Significance Controlled Variable Selection method
 }
 \description{
-	drop1SignifReg removes from the model the predictor, out of the current predictors, which minimizes the criterion (AIC, BIC, r-ajd, PRESS, max p-value) when a) the p-values of the predictors in the current model do not pass the multiple testing correction (Bonferroni, FDR, None) or b) when the p-values of both current and prospective models pass the correction but the criterion of the prospective model is smaller. 
+	drop1SignifReg removes from the model the predictor, out of the current predictors, which minimizes the criterion (AIC, BIC, r-ajd, PRESS, max p-value) when a) the p-values of the predictors in the current model do not pass the multiple testing correction (Bonferroni, FDR, None, etc) or b) when the p-values of both current and prospective models pass the correction but the criterion of the prospective model is smaller. 
 	
-	\code{max_pvalue} indicates the maximum p-value from the multiple t-tests for each predictor. More specifically, the algorithm computes the prospective models with each predictor removed, and all p-values of this prospective model. Then, the predictor to be removed is the one whose generating model has the smallest p-values, in fact, the minimum of the maximum p-values in each prospective model.
+	\code{max_pvalue} indicates the maximum p-value from the multiple t-tests for each predictor. More specifically, the algorithm computes the prospective models with each predictor included, and all p-values of this prospective model. Then, the predictor selected to be added to the model is the one whose generating model has the smallest p-values, in fact, the minimum of the maximum p-values in each prospective model.
 }
 \usage{
-drop1SignifReg(fit, scope, alpha = 0.05, criterion = "p-value",
- correction = "FDR", override = FALSE)
+drop1SignifReg(fit, scope, alpha = 0.05, criterion = "p-value", 
+   adjust.method = "fdr", override = FALSE, print.step = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{fit}{
-	an lm object representing a model.
+	an lm or glm object representing a model.
 }
   \item{scope}{
-  The range of models examined in regression. It should be either a data.frame or formula containing predictors. When scope is data.frame, all variables except the response variable in the data.frame are considered for the variable selection. 
+  defines the range of models examined in the stepwise search. This should be either a single formula, or a list containing components upper and lower, both formulae. See the details for how to specify the formulae and how they are used.
 }
   \item{alpha}{
   Significance level. Default value is 0.05.
 }
   \item{criterion}{
   Criterion to select predictor variables. \code{criterion = "AIC"}, 
-  \code{criterion = "BIC"}, \code{criterion = "r-adj"} (adjusted r-square), and \code{criterion = "p-value"} are available. Default is p-value.
+  \code{criterion = "BIC"}, \code{criterion = "r-adj"} (adjusted r-square), \code{criterion = "PRESS"}, and \code{criterion = "p-value"} are available. Default is p-value.
 }
-  \item{correction}{
-  Correction criterion to reduce multiple testing error. \code{correction = "FDR"} (False Discovery Rate), \code{correction = "Bonferroni"}, 
-  and 
-  
-  \code{correction = "None"} (no correction) are available. Default is 
-  
-  \code{correction = "FDR"} . For Bonferroni correction, 
-  
-  either \code{correction = "Bonferroni"}   or \code{correction = "Bonf"} can be used.
+  \item{adjust.method}{
+  Correction for multiple testing accumulation of error. See \code{\link{p.adjust}}.
 }
-  \item{override}{If \code{override = TRUE}, it returns a new lm object that excludes a predictor according to criterion even if the prospective model passes the correction. }
+  \item{override}{If \code{override = TRUE}, it returns a new \code{lm} or \code{glm} object that adds a new variable according to criterion even if the new model does not pass the multiple testing p-value correction.  }
+  \item{print.step}{If true, information is printed for each step of variable selection.
+  	Default is \code{FALSE}. }
+  
 }
 %\details{
 %%  ~~ If necessary, more details than the description above ~~
@@ -50,6 +46,9 @@ drop1SignifReg(fit, scope, alpha = 0.05, criterion = "p-value",
 %%  \item{comp2 }{Description of 'comp2'}
 %% ...
 %}
+\value{
+drop1SifnifReg returns an object of the class \code{lm} or \code{glm} for a generalized regression model with the additional component \code{steps.info}, which shows the steps taken during the variable selection and model metrics: Deviance, Resid.Df, Resid.Dev, AIC, BIC, adj.rsq, PRESS, max_pvalue,  max.VIF, and whether it passed the chosen p-value correction.
+}
 \references{
 Zambom A Z, Kim J. Consistent significance controlled variable selection in high-dimensional regression. Stat.2018;7:e210. https://doi.org/10.1002/sta4.210
 }
@@ -72,8 +71,9 @@ Adriano Zanin Zambom <adriano.zambom@gmail.com>
 
 data(mtcars)
 
-fit3 <- lm(mpg~., mtcars)
-drop1SignifReg(fit3)
-drop1SignifReg(fit3, scope=~.-disp-cyl-wt-hp-drat-qset-carb ,correction="Bonf")
+fit <- lm(mpg~., mtcars)
+drop1SignifReg(fit, print.step = TRUE)
+
+
 }
 
