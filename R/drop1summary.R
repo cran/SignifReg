@@ -56,7 +56,8 @@ drop1summary.default <- function(fit, scope, alpha = 0.05, adjust.method = "fdr"
 	    rownames(out_tab) <- c("<none>", paste("-",scope$drop))
 	    
 	    ########### Current Model #############################
-	    out_tab[1,1:5] <- c(deviance(fit), AIC(fit), BIC(fit), summary(fit)$"adj.r.squared", sum((residuals(fit)/(1-lm.influence(fit)$hat))^2))
+	    adjR2 = ifelse(is.null(summary(fit)$"adj.r.squared"), NA, summary(fit)$"adj.r.squared") ## NULL if glm
+	    out_tab[1,1:5] <- c(deviance(fit), AIC(fit), BIC(fit), adjR2, sum((residuals(fit)/(1-lm.influence(fit)$hat))^2))
 	    out_tab[1,7] = ifelse((length(attr(terms(fit),"term.labels")) > 1), max(vif(fit)), NA) 
 	
 	    fit_pval <- drop1(fit, test="F")$"Pr(>F)"[-1] #save p-values of the current model
@@ -71,8 +72,9 @@ drop1summary.default <- function(fit, scope, alpha = 0.05, adjust.method = "fdr"
 	    for (n in 1:length(scope$drop))
 	    {
 	        fit2 <- update(fit, paste(".~. -", scope$drop[n]))
-	        out_tab[n+1,1:5] <- c(deviance(fit2), AIC(fit2), BIC(fit2), summary(fit2)$"adj.r.squared", sum((residuals(fit2)/(1-lm.influence(fit2)$hat))^2))
-		    out_tab[n+1,7] = ifelse((length(attr(terms(fit2),"term.labels")) > 1), max(vif(fit2)), NA) 
+	        adjR2 = ifelse(is.null(summary(fit2)$"adj.r.squared"), NA, summary(fit2)$"adj.r.squared") ## NULL if glm
+	        out_tab[n+1,1:5] <- c(deviance(fit2), AIC(fit2), BIC(fit2), adjR2, sum((residuals(fit2)/(1-lm.influence(fit2)$hat))^2))
+  		    out_tab[n+1,7] = ifelse((length(attr(terms(fit2),"term.labels")) > 1), max(vif(fit2)), NA) 
 	        
 	        if (length(coef(fit2)) == 1){ ## intercept model
 	        	out_tab[n+1,6] <- out_tab[n+1,8]  <- NA

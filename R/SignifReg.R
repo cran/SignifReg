@@ -21,6 +21,9 @@ function(fit,scope, alpha = 0.05,direction = "forward",criterion = "p-value",adj
     if(criterion != "p-value" && criterion != "AIC" && criterion != "BIC" && criterion != "r-adj" && criterion != "PRESS"){
         stop("\ncriterion should be one of the following: p-value, AIC, BIC, r-adj, or PRESS\n")
     }
+    if(criterion == "r-adj" && is.null(summary(fit)$"adj.r.squared")){
+      stop("\nr-adj not a valid criterion for a glm model\n")
+    }
     if(alpha>1 || alpha <0){
         stop("\nSignificance level alpha should be smaller than 1 and larger than 0\n")
     }
@@ -62,7 +65,7 @@ function(fit,scope, alpha = 0.05,direction = "forward",criterion = "p-value",adj
     		{
 	          if(trace==TRUE) 
     	      	print(fit)
-    	    	
+    		  
 		      	new_fit = add1SignifReg(fit, scope = scope, alpha = alpha, criterion = criterion, adjust.method = adjust.method, print.step = trace)
 		      	if (identical(new_fit, fit))
 		      		break
