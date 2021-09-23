@@ -7,13 +7,10 @@ drop1SignifReg.default <- function(fit, scope, alpha = 0.05, criterion = "p-valu
     if(criterion != "p-value" && criterion != "AIC" && criterion != "BIC" && criterion != "r-adj" && criterion != "PRESS"){
         stop("\ncriterion should be one of the following: p-value, AIC, BIC, r-adj, or PRESS\n")
     }
-    if(criterion == "r-adj" && is.null(summary(fit)$"adj.r.squared")){
-      stop("\nr-adj not a valid criterion for a glm model\n")
-    }
     if ((adjust.method != "fdr") && (adjust.method != "holm") && (adjust.method != "hochberg") && (adjust.method != "hommel") && (adjust.method != "bonferroni") && (adjust.method != "BH") && (adjust.method != "BY") && (adjust.method != "none"))
        stop("adjust.method must be a valid method for p.adjust()")
   
-    if(alpha>1 || alpha <0){
+  if(alpha>1 || alpha <0){
         stop("\nSignificance level alpha should be smaller than 1 and larger than 0\n")
     }
     if(override != FALSE && override != TRUE){

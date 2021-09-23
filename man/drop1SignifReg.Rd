@@ -11,7 +11,7 @@ Drop a predictor to a (generalized) linear regression model using the backward s
 }
 \usage{
 drop1SignifReg(fit, scope, alpha = 0.05, criterion = "p-value", 
-   adjust.method = "fdr", override = FALSE, print.step = FALSE)
+  adjust.method = "fdr", override = FALSE, print.step = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

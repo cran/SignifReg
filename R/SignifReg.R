@@ -21,16 +21,17 @@ function(fit,scope, alpha = 0.05,direction = "forward",criterion = "p-value",adj
     if(criterion != "p-value" && criterion != "AIC" && criterion != "BIC" && criterion != "r-adj" && criterion != "PRESS"){
         stop("\ncriterion should be one of the following: p-value, AIC, BIC, r-adj, or PRESS\n")
     }
-    if(criterion == "r-adj" && is.null(summary(fit)$"adj.r.squared")){
-      stop("\nr-adj not a valid criterion for a glm model\n")
-    }
     if(alpha>1 || alpha <0){
         stop("\nSignificance level alpha should be smaller than 1 and larger than 0\n")
     }
     if(trace != FALSE && trace != TRUE){
         stop("\ntrace should be either TRUE or FALSE\n")
     }
-    
+    if (criterion == "r-adj")
+    {
+      if (is.null(summary(fit)$"adj.r.squared"))
+         stop("\nr-adj not a valid criterion for glm\n")
+    }
        
     
     
@@ -52,7 +53,8 @@ function(fit,scope, alpha = 0.05,direction = "forward",criterion = "p-value",adj
       passed.correction <- ifelse(sum(p.adjust(fit_pval, method = adjust.method) <= alpha) < length(fit_pval), FALSE, TRUE) #pvalue cut-off (no correction)
       max_vif = ifelse((length(attr(terms(fit),"term.labels")) > 1), max(vif(fit)), NA) 
     }
-    steps.info = data.frame("Step" = "", "Df" = NA, Deviance = "", "Resid Df" = fit$df.residual, "Resid Dev" = deviance(fit), AIC = AIC(fit), BIC = BIC(fit), "adj.rsq" = summary(fit)$"adj.r.squared", "PRESS" = sum((residuals(fit)/(1-lm.influence(fit)$hat))^2), "max_pvalue" = max_pval, "max VIF" = max_vif, "correction" = passed.correction)
+    adj.rsq = ifelse(is.null(summary(fit)$"adj.r.squared"), NA, summary(fit)$"adj.r.squared")
+    steps.info = data.frame("Step" = "", "Df" = NA, Deviance = "", "Resid Df" = fit$df.residual, "Resid Dev" = deviance(fit), AIC = AIC(fit), BIC = BIC(fit), "adj.rsq" = adj.rsq, "PRESS" = sum((residuals(fit)/(1-lm.influence(fit)$hat))^2), "max_pvalue" = max_pval, "max VIF" = max_vif, "correction" = passed.correction)
     colnames(steps.info)[12] = paste("pass", adjust.method, "correction")
     steps.info[,5:11] <- data.frame(lapply(steps.info[,5:11], round, 5)) 
     
@@ -65,7 +67,7 @@ function(fit,scope, alpha = 0.05,direction = "forward",criterion = "p-value",adj
     		{
 	          if(trace==TRUE) 
     	      	print(fit)
-    		  
+    	    	
 		      	new_fit = add1SignifReg(fit, scope = scope, alpha = alpha, criterion = criterion, adjust.method = adjust.method, print.step = trace)
 		      	if (identical(new_fit, fit))
 		      		break

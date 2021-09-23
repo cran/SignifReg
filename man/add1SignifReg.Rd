@@ -12,7 +12,7 @@ Add a predictor to a (generalized) linear regression model using the forward ste
 }
 \usage{
 add1SignifReg(fit, scope, alpha = 0.05, criterion = "p-value", 
-   adjust.method = "fdr", override = FALSE, print.step = FALSE)
+  adjust.method = "fdr", override = FALSE, print.step = FALSE)
 }
 \arguments{
   \item{fit}{

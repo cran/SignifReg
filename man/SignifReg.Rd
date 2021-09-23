@@ -9,8 +9,8 @@ Significance Controlled Variable Selection in (Generalized) Linear Regression
   The algorithm selects a final model with only significant variables based on a correction choice of False Discovery Rate, Bonferroni, etc from the p.adjust().
 }
 \usage{
-SignifReg(fit, scope, alpha = 0.05, direction = "forward",criterion = "p-value", 
-   adjust.method = "fdr", trace=FALSE)
+SignifReg(fit, scope, alpha = 0.05, direction = "forward",
+  criterion = "p-value", adjust.method = "fdr", trace=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -83,14 +83,14 @@ select.fit$steps.info
 
 fit = lm(mpg ~cyl + hp + am + gear, data = mtcars)
 select.fit = SignifReg(fit,scope=scope, alpha = 0.05,direction = "backward",
-   criterion = "p-value",adjust.method = "fdr",trace=TRUE)
+  criterion = "p-value",adjust.method = "fdr",trace=TRUE)
 select.fit$steps.info
 
 
 
 fit = lm(mpg ~ cyl + hp + am + gear + disp, data = mtcars)
 select.fit = SignifReg(fit,scope=scope, alpha = 0.5,direction = "both",
-   criterion = "AIC",adjust.method = "fdr",trace=TRUE)
+  criterion = "AIC",adjust.method = "fdr",trace=TRUE)
 select.fit$steps.info
 
 
