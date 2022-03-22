@@ -75,7 +75,7 @@ function(fit,scope, alpha = 0.05,direction = "forward",criterion = "p-value",adj
 
 		       	fit = new_fit        	
 		       	steps.info = rbind(steps.info, fit$step.info)
-			
+			      fit$step.info = NULL
         }	
      }   	
         	
@@ -92,6 +92,7 @@ function(fit,scope, alpha = 0.05,direction = "forward",criterion = "p-value",adj
 				break
 			fit = new_fit        	
 			steps.info = rbind(steps.info, fit$step.info)
+			fit$step.info = NULL
 		}	
     }   	
         	        	
@@ -216,6 +217,7 @@ function(fit,scope, alpha = 0.05,direction = "forward",criterion = "p-value",adj
   			old_fit = fit				
 	  		fit = new_fit        	
 	  		steps.info = rbind(steps.info, fit$step.info)
+	  		fit$step.info = NULL
 	  		var_current <- attr(terms(fit), "factors")
 	  		scope_var <- factor.scope(var_current, list(add = var_upper, drop = var_lower))    
 	  		

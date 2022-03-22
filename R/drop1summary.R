@@ -100,10 +100,12 @@ drop1summary.default <- function(fit, scope, alpha = 0.05, adjust.method = "fdr"
 			sort_var = 2
 		else if (sort.by == "BIC")
 			sort_var = 3
-		else if (sort.by == "r-adj")
-			sort_var = 4
 		else if (sort.by == "PRESS")
 			sort_var = 5
+	    
+    if (sort.by == "r-adj")
+      out_tab = out_tab[order(as.numeric(out_tab[,4]),decreasing = TRUE),]
+	  else
 	    out_tab = out_tab[order(as.numeric(out_tab[,sort_var])),]
 	    
 	    out_tab[,1:7] = data.frame(lapply(out_tab[,1:7], round, 5))
